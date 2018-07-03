@@ -1,0 +1,112 @@
+# Auto DevOps
+# This CI/CD configuration provides a standard pipeline for
+# * building a Docker image (using a buildpack if necessary),
+# * storing the image in the container registry,
+# * running tests from a buildpack,
+# * running code quality analysis,
+# * creating a review app for each topic branch,
+# * and continuous deployment to production
+#
+# Test jobs may be disabled by setting environment variables:
+# * test: TEST_DISABLED
+# * code_quality: CODE_QUALITY_DISABLED
+# * license_management: LICENSE_MANAGEMENT_DISABLED
+# * performance: PERFORMANCE_DISABLED
+# * sast: SAST_DISABLED
+# * dependency_scanning: DEPENDENCY_SCANNING_DISABLED
+# * container_scanning: CONTAINER_SCANNING_DISABLED
+# * dast: DAST_DISABLED
+# * review: REVIEW_DISABLED
+# * stop_review: REVIEW_DISABLED
+#
+# In order to deploy, you must have a Kubernetes cluster configured either
+# via a project integration, or via group/project variables.
+# AUTO_DEVOPS_DOMAIN must also be set as a variable at the group or project
+# level, or manually added below.
+#
+# Continuous deployment to production is enabled by default.
+# If you want to deploy to staging first, or enable incremental rollouts,
+# set STAGING_ENABLED or INCREMENTAL_ROLLOUT_ENABLED environment variables.
+# If you want to use canary deployments, set CANARY_ENABLED environment variable.
+#
+# If Auto DevOps fails to detect the proper buildpack, or if you want to
+# specify a custom buildpack, set a project variable `BUILDPACK_URL` to the
+# repository URL of the buildpack.
+# e.g. BUILDPACK_URL=https://github.com/heroku/heroku-buildpack-ruby.git#v142
+# If you need multiple buildpacks, add a file to your project called
+# `.buildpacks` that contains the URLs, one on each line, in order.
+# Note: Auto CI does not work with multiple buildpacks yet
+
+image: alpine:latest
+
+variables:
+  # AUTO_DEVOPS_DOMAIN is the application deployment domain and should be set as a variable at the group or project level.
+  # AUTO_DEVOPS_DOMAIN: domain.example.com
+
+stages:
+  - build
+  - test
+
+build:
+  stage: build
+  image: docker:stable-git
+  services:
+  - docker:stable-dind
+  variables:
+    DOCKER_DRIVER: overlay2
+  script:
+    - setup_docker
+    - build
+  only:
+    - master
+
+test:
+  stage: test
+  image: christiantragesser/dind-ci
+  script:
+    - whoami
+    - pwd
+    - ls -al $PWD
+  only:
+    - master
+  except:
+    variables:
+      - $TEST_DISABLED
+
+code_quality:
+  stage: test
+  image: docker:stable
+  variables:
+    DOCKER_DRIVER: overlay2
+  allow_failure: true
+  services:
+    - docker:stable-dind
+  script:
+    - setup_docker
+    - code_quality
+  artifacts:
+    paths: [gl-code-quality-report.json]
+  only:
+    - master
+  except:
+    variables:
+      - $CODE_QUALITY_DISABLED
+
+container_scanning:
+  stage: test
+  image: docker:stable
+  variables:
+    DOCKER_DRIVER: overlay2
+  allow_failure: true
+  services:
+    - docker:stable-dind
+  script:
+    - setup_docker
+    - container_scanning
+  artifacts:
+    paths: [gl-container-scanning-report.json]
+  only:
+    - master
+  except:
+    variables:
+      - $CONTAINER_SCANNING_DISABLED
