@@ -37,30 +37,30 @@ function build {
 }
 
 function uat {
-  PULL_IMAGES=(christiantragesser/dind-ci)
+  PULL_IMAGES=(tutum/curl)
   pull_images
   echo -e "${CYAN}---- Start UAT tests ----${NC}"
 
-  docker network create $NETWORK > /dev/null 2>&1 || true
+  docker network create $NETWORK || true
   docker run -d --net $NETWORK --name poc-app local/poc_app
   docker run --rm -i \
     -v $PWD:/tmp \
     -w /tmp/tests \
     --net $NETWORK \
-    christiantragesser/dind-ci bash -C uat.sh poc-app
+    tutum/curl bash -C uat.sh poc-app
   docker tag local/poc_app christiantragesser/poc_app
 
   echo -e "${PURPLE}---- Testing complete ----${NC}"
 }
 
 function image_scan {
-  PULL_IMAGES=(arminc/clair-db:latest christiantragesser/dind-ci arminc/clair-local-scan:v2.0.1 christiantragesser/clair-scanner)
+  PULL_IMAGES=(arminc/clair-db:latest ubuntu arminc/clair-local-scan:v2.0.1 christiantragesser/clair-scanner)
   pull_images
   echo -e "${CYAN}---- Docker image CVE scan ----${NC}"
  
   docker network create $NETWORK || true
   docker run -d --name postgres --net $NETWORK arminc/clair-db:latest
-  docker run --rm --net $NETWORK christiantragesser/dind-ci bash -c "while ! timeout 1 bash -c 'cat < /dev/null > /dev/tcp/postgres/5432' &>/dev/null; do :; done"
+  docker run --rm --net $NETWORK ubuntu bash -c "while ! timeout 1 bash -c 'cat < /dev/null > /dev/tcp/postgres/5432' &>/dev/null; do :; done"
   docker run -d --name clair --net $NETWORK arminc/clair-local-scan:v2.0.1
   docker run --rm -i --net $NETWORK \
     -v $PWD:/tmp \
