@@ -3,10 +3,8 @@
 set -e
 
 SCRIPT=`basename "$0"`
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
 if [ ! $# == 1 ]; then
-    printf "\n $SCRIPT script needs a parameter: unit, test, etc. \n ex: '$SCRIPT test' \n\n"
+    printf "\n $SCRIPT script needs a parameter: test, scan, or purge. \n ex: '$SCRIPT test' \n\n"
     exit 1
 fi
 
@@ -19,13 +17,9 @@ NC='\033[0m'
 function ci {
   case $OPTION in
     test) build
-          PULL_IMAGES=(christiantragesser/dind-ci)
-          pull_images
           uat
     ;;
-    scan) PULL_IMAGES=(arminc/clair-db:latest christiantragesser/dind-ci arminc/clair-local-scan:v2.0.1 christiantragesser/clair-scanner)
-          pull_images
-          image_scan
+    scan) image_scan
     ;;
     purge) purge_containers
     ;;
@@ -43,9 +37,11 @@ function build {
 }
 
 function uat {
+  PULL_IMAGES=(christiantragesser/dind-ci)
+  pull_images
   echo -e "${CYAN}---- Start UAT tests ----${NC}"
 
-  docker network create $NETWORK || true
+  docker network create $NETWORK > /dev/null 2>&1 || true
   docker run -d --net $NETWORK --name poc-app local/poc_app
   docker run --rm -i \
     -v $PWD:/tmp \
@@ -58,6 +54,8 @@ function uat {
 }
 
 function image_scan {
+  PULL_IMAGES=(arminc/clair-db:latest christiantragesser/dind-ci arminc/clair-local-scan:v2.0.1 christiantragesser/clair-scanner)
+  pull_images
   echo -e "${CYAN}---- Docker image CVE scan ----${NC}"
  
   docker network create $NETWORK || true
