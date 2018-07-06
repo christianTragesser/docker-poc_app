@@ -54,14 +54,14 @@ function uat {
 }
 
 function image_scan {
-  PULL_IMAGES=(arminc/clair-db:latest ubuntu arminc/clair-local-scan:v2.0.1 christiantragesser/clair-scanner)
+  PULL_IMAGES=(arminc/clair-db:latest ubuntu arminc/clair-local-scan:v2.0.3 christiantragesser/clair-scanner)
   pull_images
   echo -e "${CYAN}---- Docker image CVE scan ----${NC}"
  
   docker network create $NETWORK || true
   docker run -d --name postgres --net $NETWORK arminc/clair-db:latest
   docker run --rm --net $NETWORK ubuntu bash -c "while ! timeout 1 bash -c 'cat < /dev/null > /dev/tcp/postgres/5432' &>/dev/null; do :; done"
-  docker run -d --name clair --net $NETWORK arminc/clair-local-scan:v2.0.1
+  docker run -d --name clair --net $NETWORK arminc/clair-local-scan:v2.0.3
   docker run --rm -i --net $NETWORK \
     -v $PWD:/tmp \
     -v /var/run/docker.sock:/var/run/docker.sock \
