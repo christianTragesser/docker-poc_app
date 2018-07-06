@@ -1,5 +1,8 @@
 image: christiantragesser/dind-ci
 
+variables:
+    DOCKER_DRIVER: overlay2
+    
 services:
 - docker:stable-dind
 
