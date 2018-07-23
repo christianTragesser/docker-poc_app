@@ -74,7 +74,7 @@ function pull_images {
   for IMAGE in ${PULL_IMAGES[@]};
   do
     echo -e "${CYAN}+ Pulling image ${IMAGE}:${NC}"
-    docker pull $IMAGE;
+    docker pull $IMAGE | grep -e 'Pulling from' -e Digest -e Status -e Error;
   done  
 }
 
