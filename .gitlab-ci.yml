@@ -1,4 +1,4 @@
-image: christiantragesser/dind-ci
+image: christiantragesser/dind-ci:python
 
 variables:
     DOCKER_DRIVER: overlay2
@@ -12,8 +12,8 @@ stages:
 test:
   stage: test
   script:
-    - $CI_PROJECT_DIR/poc_ci.sh test
-    - $CI_PROJECT_DIR/poc_ci.sh scan
+    - $CI_PROJECT_DIR/ci.py test
+    - $CI_PROJECT_DIR/ci.py scan
   only:
     - master
   artifacts:
