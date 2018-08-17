@@ -37,7 +37,7 @@ def qa():
     pipeline.runLatest()
 
 def main():
-    parser = ArgumentParser(prog='dind-ci-py')
+    parser = ArgumentParser(prog='ci-py')
     parser.add_argument('option', type=str,
                         help='run pipeline option; test, scan, local, qa')
     args = parser.parse_args()
