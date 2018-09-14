@@ -2,6 +2,8 @@ image: registry.gitlab.com/christiantragesser/dind-py:latest
 
 variables:
     DOCKER_DRIVER: overlay2
+    LOCAL_TAG: local/poc_app
+    EXT_TAG: $CI_REGISTRY/christiantragesser/docker-poc_app
     
 services:
 - docker:stable-dind
@@ -14,6 +16,9 @@ test:
   script:
     - $CI_PROJECT_DIR/ci.py test
     - $CI_PROJECT_DIR/ci.py scan
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - docker tag $LOCAL_TAG ${EXT_TAG}:latest 
+    - docker push ${EXT_TAG}:latest | grep -e "The push refers to" -e latest
   only:
     - master
   artifacts:
