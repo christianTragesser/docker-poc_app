@@ -4,8 +4,8 @@ from argparse import ArgumentParser
 from poc import POC
 
 dirPath = os.path.dirname(os.path.realpath(__file__))
-
 pipeline = POC(dockerRegistry='christiantragesser')
+localTag = 'local/poc_app'
 
 def ci(option):
     stage = {
@@ -19,17 +19,17 @@ def ci(option):
 
 def test():
     print('Starting tests:')
-    pipeline.buildImage(dirPath,'local/poc_app')
+    pipeline.buildImage(dirPath,localTag)
     pipeline.uatTest(dirPath)
     print('Testing complete')
 
 def securityScan():
     print('Starting security scans:')
-    pipeline.cveScan('local/poc_app')
+    pipeline.cveScan(localTag)
 
 def local():
     print('Initializing locally built instance:')
-    pipeline.buildImage(dirPath,'local/poc_app')
+    pipeline.buildImage(dirPath,localTag)
     pipeline.runLocal()
 
 def qa():
