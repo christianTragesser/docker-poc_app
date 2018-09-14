@@ -1,0 +1,8 @@
+apiVersion: v1
+description: Distributed container poc
+name: poc-app
+version: 0.1.0
+keywords:
+  - ctt
+  - http
+  - poc
