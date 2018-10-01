@@ -4,7 +4,7 @@ CHECKMARK="\xE2\x9C\x94"
 CROSSBONES="\xE2\x98\xA0"
 echo -e "\nImplementing tests:"
 
-curl -s $1 | grep --quiet "Server hostname"
+curl -s $1 | grep --quiet "Hostname:"
 hostResult=$?
 
 if [ $hostResult -eq 0 ]; then
@@ -13,7 +13,7 @@ else
   echo -e "\t$CROSSBONES  Hostname content not seen" && exit $hostResult
 fi
 
-curl -s $1 | grep --quiet "Server LAN IP address"
+curl -s $1 | grep --quiet "Local IP:"
 ipResult=$?
 
 if [ $ipResult -eq 0 ]; then

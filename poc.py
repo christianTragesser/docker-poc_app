@@ -10,8 +10,8 @@ class POC(Pipeline):
         cleanMe = []
        
         cleanMe.append(self.runContainerDetached(image='local/poc_app', name='poc-app-test'))
-        self.runContainerInteractive(image='tutum/curl', name='poc-uat', working_dir=self.working_dir,
-                                     volumes=self.pocVolumes, command='./tests/uat.sh poc-app-test')
+        self.runContainerInteractive(image='tutum/curl:latest', name='poc-uat', working_dir=self.working_dir,
+                                     volumes=self.pocVolumes, command='./tests/uat.sh poc-app-test:5000')
 
         self.purgeContainers(cleanMe)
 
