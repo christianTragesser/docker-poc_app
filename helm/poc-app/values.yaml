@@ -2,7 +2,7 @@ replicaCount: 2
 namespace: default
 fullname: poc-app
 image:
-  repository: christiantragesser/poc_app
+  repository: registry.gitlab.com/christiantragesser/docker-poc_app
   tag: latest
   pullPolicy: Always
 service:
@@ -13,15 +13,15 @@ service:
 ingress:
   enabled: true
   hosts:
-    - example.com
+    - poc.ctt.io
   annotations:
     kubernetes.io/ingress.class: traefik
 resources:
   limits:
-    cpu: 500m
+    cpu: 50m
     memory: 128Mi
   requests:
-    cpu: 100m
+    cpu: 10m
     memory: 64Mi
 readinessProbe:
   failureThreshold: 3
