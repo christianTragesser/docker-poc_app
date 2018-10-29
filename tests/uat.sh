@@ -2,7 +2,7 @@
 
 CHECKMARK="\xE2\x9C\x94"
 CROSSBONES="\xE2\x98\xA0"
-echo -e "\nImplementing tests:"
+echo -e "\n UAT testing:"
 
 curl -s $1 | grep --quiet "Hostname:"
 hostResult=$?
@@ -29,4 +29,13 @@ if [ $backgroundResult -eq 0 ]; then
   echo -e "\t$CHECKMARK  Background color check passed"
 else
   echo -e "\t$CROSSBONES  Background color check failed" && exit $backgroundResult
+fi
+
+curl -s "${1}/status" | grep --quiet "sha"
+statusResult=$?
+
+if [ $statusResult -eq 0 ]; then
+  echo -e "\t$CHECKMARK  Status endpoint passed"
+else
+  echo -e "\t$CROSSBONES  Status endpoint failed" && exit $statusResult
 fi

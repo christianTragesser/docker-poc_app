@@ -4,26 +4,28 @@ import os
 import socket
 
 app = Flask(__name__)
-versionFile = '/opt/GIT_SHA'
-
-if os.path.exists(versionFile):
-    shaFile = open(versionFile, 'r')
-    gitSHA = shaFile.read()
-    gitSHA = gitSHA.replace('\n', '')
-    shaFile.close()
-else:
-    gitSHA = 'non-pipeline build'
 
 def getHostData():
+    versionFile = '/opt/GIT_SHA'
     host = {}
+    
+    if os.path.exists(versionFile):
+        shaFile = open(versionFile, 'r')
+        gitSHA = shaFile.read()
+        gitSHA = gitSHA.replace('\n', '')
+        shaFile.close()
+    else:
+        gitSHA = 'non-pipeline build'
+
     try: 
         host['name'] = socket.gethostname() 
         host['ip'] = socket.gethostbyname(host['name']) 
-        return host
     except: 
         host['name'] = 'NA' 
         host['ip'] = 'NA'
-        return host
+        
+    host['sha'] = gitSHA
+    return host
 
 def prettyPrint(hostData):
    status = '''
@@ -33,7 +35,7 @@ def prettyPrint(hostData):
    Local IP: {1:s}\n<br/>
    Version: {2:s}\n<br/>
    </center>
-   '''.format(hostData['name'], hostData['ip'], gitSHA) 
+   '''.format(hostData['name'], hostData['ip'], hostData['sha']) 
    return status
 
 @app.route('/')
@@ -43,5 +45,6 @@ def route_root():
 
 @app.route('/status')
 def route_status():
-    currentStatus = { 'sha': gitSHA }
+    hostInfo = getHostData()
+    currentStatus = { 'sha': hostInfo['sha'] }
     return json.dumps(currentStatus)+'\n'

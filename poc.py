@@ -1,6 +1,15 @@
 from dind import Pipeline, bcolors
 
 class POC(Pipeline):
+    def unitTest(self, path):
+        self.pocPath = path
+        self.pocVolumes = {
+            self.pocPath: { 'bind': '/tmp', 'mode': 'rw'}
+        }
+        self.working_dir = '/tmp'
+        self.runContainerInteractive(image='registry.gitlab.com/christiantragesser/dind-py:poc', name='poc-unit', working_dir=self.working_dir,
+                                     volumes=self.pocVolumes, command='pytest ./tests')
+
     def uatTest(self, path):
         self.pocPath = path
         self.pocVolumes = {
@@ -16,12 +25,12 @@ class POC(Pipeline):
         self.purgeContainers(cleanMe)
 
     def runLatest(self):
-        self.localPorts = { 80: 8888 }
+        self.localPorts = { 5000: 8888 }
         self.runContainerDetached(image=self.dockerRegistry+'/poc_app:latest', name='poc-app')
         print(bcolors.HEADER+'  * Latest version of POC app accessible at http://localhost:8888'+bcolors.ENDC)
 
     def runLocal(self):
-        self.localPorts = { 80: 8888 }
+        self.localPorts = { 5000: 8888 }
         self.runContainerDetached(image='local/poc_app', name='poc-app', ports=self.localPorts)
         print(bcolors.HEADER+'  * Local instance of POC app accessible at http://localhost:8888'+bcolors.ENDC)
     

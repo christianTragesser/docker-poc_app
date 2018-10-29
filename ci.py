@@ -19,6 +19,7 @@ def ci(option):
 
 def test():
     print('Starting tests:')
+    pipeline.unitTest(dirPath)
     pipeline.buildImage(dirPath,localTag)
     pipeline.uatTest(dirPath)
     print('Testing complete')
