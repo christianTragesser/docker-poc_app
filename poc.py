@@ -1,4 +1,4 @@
-from dind import Pipeline, bcolors
+from pyplineCI import Pipeline, bcolors
 
 class POC(Pipeline):
     def unitTest(self, path):
@@ -7,7 +7,7 @@ class POC(Pipeline):
             self.pocPath: { 'bind': '/tmp', 'mode': 'rw'}
         }
         self.working_dir = '/tmp'
-        self.runContainerInteractive(image='registry.gitlab.com/christiantragesser/dind-py:poc', name='poc-unit', working_dir=self.working_dir,
+        self.runI(image='registry.gitlab.com/christiantragesser/pypline-ci:poc', name='poc-unit', working_dir=self.working_dir,
                                      volumes=self.pocVolumes, command='pytest ./tests')
 
     def uatTest(self, path):
@@ -18,20 +18,20 @@ class POC(Pipeline):
         self.working_dir = '/tmp'
         cleanMe = []
        
-        cleanMe.append(self.runContainerDetached(image='local/poc_app', name='poc-app-test'))
-        self.runContainerInteractive(image='tutum/curl:latest', name='poc-uat', working_dir=self.working_dir,
+        cleanMe.append(self.runD(image='local/poc_app', name='poc-app-test'))
+        self.runI(image='tutum/curl:latest', name='poc-uat', working_dir=self.working_dir,
                                      volumes=self.pocVolumes, command='./tests/uat.sh poc-app-test:5000')
 
         self.purgeContainers(cleanMe)
 
     def runLatest(self):
         self.localPorts = { 5000: 8888 }
-        self.runContainerDetached(image=self.dockerRegistry+'/poc_app:latest', name='poc-app')
+        self.runD(image=self.dockerRegistry+'/poc_app:latest', name='poc-app')
         print(bcolors.HEADER+'  * Latest version of POC app accessible at http://localhost:8888'+bcolors.ENDC)
 
     def runLocal(self):
         self.localPorts = { 5000: 8888 }
-        self.runContainerDetached(image='local/poc_app', name='poc-app', ports=self.localPorts)
+        self.runD(image='local/poc_app', name='poc-app', ports=self.localPorts)
         print(bcolors.HEADER+'  * Local instance of POC app accessible at http://localhost:8888'+bcolors.ENDC)
     
     def runMYSQL(self):
@@ -41,4 +41,4 @@ class POC(Pipeline):
             'MYSQL_ROOT_HOST': '%'
         }
         command = '--sql-mode="ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION"'
-        return self.runContainerDetached(image='mysql:5.6', name='mysql.ci.local', env_vars=env_vars, command=command)
+        return self.runD(image='mysql:5.6', name='mysql.ci.local', env_vars=env_vars, command=command)
