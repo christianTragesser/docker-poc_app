@@ -4,7 +4,7 @@ from argparse import ArgumentParser
 from poc import POC
 
 dirPath = os.path.dirname(os.path.realpath(__file__))
-pipeline = POC(dockerRegistry='christiantragesser')
+pipeline = POC(dockerRegistry='registry.gitlab.com/')
 localTag = 'local/poc_app'
 
 def ci(option):
@@ -14,14 +14,18 @@ def ci(option):
         'local': local,
         'qa': qa
     }
-    run = stage.get(option, test)
-    run()
+    run = stage.get(option, None)
+    if run:
+        run()
+    else:
+        print("'{}' not a valid option".format(option))
+        exit(1)
 
 def test():
     print('Starting tests:')
-    pipeline.unitTest(dirPath)
-    pipeline.buildImage(dirPath,localTag)
-    pipeline.uatTest(dirPath)
+    pipeline.unit_test(dirPath)
+    pipeline.build_image(dirPath,localTag)
+    pipeline.uat_test(dirPath)
     print('Testing complete')
 
 def securityScan():
@@ -30,12 +34,12 @@ def securityScan():
 
 def local():
     print('Initializing locally built instance:')
-    pipeline.buildImage(dirPath,localTag)
-    pipeline.runLocal()
+    pipeline.build_image(dirPath,localTag)
+    pipeline.run_local()
 
 def qa():
     print('Starting POC app:')
-    pipeline.runLatest()
+    pipeline.run_latest()
 
 def main():
     parser = ArgumentParser(prog='ci-py')

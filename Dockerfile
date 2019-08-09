@@ -2,8 +2,7 @@ FROM python:3-alpine
 
 RUN pip install flask --no-cache-dir && \
     addgroup -S -g 2222 poc && \
-    adduser -S -u 2222 -g poc poc && \
-    mkdir /opt
+    adduser -S -u 2222 -g poc poc
     
 COPY main.py GIT_* /opt/
 

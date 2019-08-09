@@ -47,7 +47,7 @@ function uat {
     -v $PWD:/tmp \
     -w /tmp/tests \
     --net $NETWORK \
-    tutum/curl bash -C uat.sh poc-app
+    tutum/curl bash -C uat.sh poc-app:5000
   docker tag local/poc_app christiantragesser/poc_app
 
   echo -e "${PURPLE}---- Testing complete ----${NC}"
