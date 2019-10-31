@@ -8,8 +8,8 @@ image:
 service:
   name: poc-app
   type: ClusterIP
-  externalPort: 80
-  internalPort: 80
+  externalPort: 5000
+  internalPort: 5000
 ingress:
   enabled: true
   hosts:
@@ -27,7 +27,7 @@ readinessProbe:
   failureThreshold: 3
   httpGet:
     path: /
-    port: 80
+    port: 5000
     scheme: HTTP
   periodSeconds: 10
   successThreshold: 1
@@ -36,7 +36,7 @@ livenessProbe:
   failureThreshold: 3
   httpGet:
     path: /
-    port: 80
+    port: 5000
     scheme: HTTP
   periodSeconds: 10
   successThreshold: 1
