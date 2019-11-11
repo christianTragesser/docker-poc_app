@@ -19,14 +19,14 @@ def test_get_host_data(mock_socket_gethostname, mock_socket_gethostbyname):
 
 
 '''
-  # takes in host data, pretty print data
+  # takes in host data, prints html
 '''
 hostInfoResponse = { 'name': 'testhost', 'ip': '1.1.1.1', 'sha': 'testbuild'}
-@mock.patch('main.pretty_print')
+@mock.patch('main.html_data')
 @mock.patch('main.get_host_data', return_value=hostInfoResponse)
-def test_route_root(mock_get_hostdata, mock_prettyPrint):
+def test_route_root(mock_get_hostdata, mock_html_data):
     main.route_root()
-    mock_prettyPrint.assert_called()
+    mock_html_data.assert_called()
 
 '''
   # get hostname data, returns git sha json

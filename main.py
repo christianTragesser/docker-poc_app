@@ -26,7 +26,7 @@ def get_host_data():
     host['sha'] = gitSHA
     return host
 
-def pretty_print(hostData):
+def html_data(hostData):
    status = '''
    <body style="background-color:white;"></body>
    <H1>
@@ -42,7 +42,7 @@ def pretty_print(hostData):
 @app.route('/')
 def route_root():
     hostInfo = get_host_data()
-    return pretty_print(hostInfo)
+    return html_data(hostInfo)
 
 @app.route('/status')
 def route_status():
