@@ -30,7 +30,7 @@ def test():
 
 def securityScan():
     print('Starting security scans:')
-    pipeline.cveScan(localTag)
+    pipeline.cve_scan(localTag)
 
 def local():
     print('Initializing locally built instance:')

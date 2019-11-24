@@ -3,12 +3,12 @@ image: registry.gitlab.com/christiantragesser/pypline-ci:poc
 variables:
     DOCKER_DRIVER: overlay2
     DOCKER_HOST: tcp://localhost:2375
+    DOCKER_TLS_CERTDIR: ""
     LOCAL_TAG: local/poc_app
     EXT_TAG: $CI_REGISTRY/christiantragesser/docker-poc_app
     
 services:
 - name: docker:stable-dind
-  command: ["--registry-mirror=https://dockerhub-mirror0.artifactory.asynchrony.com"]
 
 stages:
   - test
@@ -21,7 +21,9 @@ test:
     - $CI_PROJECT_DIR/ci.py scan
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - docker tag $LOCAL_TAG ${EXT_TAG}:latest 
+    - docker tag ${EXT_TAG}:latest ${EXT_TAG}:master-${CI_COMMIT_SHORT_SHA}
     - docker push ${EXT_TAG}:latest | grep -e "The push refers to" -e latest
+    - docker push ${EXT_TAG}:master-${CI_COMMIT_SHORT_SHA} | grep -e "The push refers to" -e latest
   only:
     - master
   artifacts:

@@ -1,6 +1,7 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: {{ .Values.namespace | quote }}
   name: {{ .Values.fullname }}
   labels:
     app: {{ template "name" . }}
@@ -8,18 +9,9 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
-  affinity:
-    podAntiAffinity:
-      preferredDuringSchedulingIgnoredDuringExecution:
-      - weight: 100
-        podAffinityTerm:
-          labelSelector:
-            matchExpressions:
-            - key: app
-              operator: In
-              values:
-              - {{ template "name" . }} 
-          topologyKey: kubernetes.io/hostname
+  selector:
+    matchLabels:
+      app: {{ template "name" . }}
   replicas: {{ .Values.replicaCount }}
   template:
     metadata:
@@ -27,6 +19,18 @@ spec:
         app: {{ template "name" . }}
         release: {{ .Release.Name }}
     spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - {{ template "name" . }} 
+              topologyKey: kubernetes.io/hostname
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
