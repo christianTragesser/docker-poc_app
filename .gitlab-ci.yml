@@ -2,7 +2,7 @@ image: registry.gitlab.com/christiantragesser/pypline-ci:poc
 
 variables:
     DOCKER_DRIVER: overlay2
-    DOCKER_HOST: tcp://localhost:2375
+    DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
     LOCAL_TAG: local/poc_app
     EXT_TAG: $CI_REGISTRY/christiantragesser/docker-poc_app
@@ -15,6 +15,8 @@ stages:
 
 test:
   stage: test
+  tags:
+    - docker
   script:
     - echo "$CI_COMMIT_SHORT_SHA" > $CI_PROJECT_DIR/GIT_SHA
     - $CI_PROJECT_DIR/ci.py test
