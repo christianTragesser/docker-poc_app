@@ -16,7 +16,7 @@ stages:
 test:
   stage: test
   script:
-    - echo "$CI_COMMIT_SHA" > $CI_PROJECT_DIR/GIT_SHA
+    - echo "$CI_COMMIT_SHORT_SHA" > $CI_PROJECT_DIR/GIT_SHA
     - $CI_PROJECT_DIR/ci.py test
     - $CI_PROJECT_DIR/ci.py scan
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
